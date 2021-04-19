@@ -19,7 +19,7 @@ class DialogCustom(QDialog):
         self.__enc = True
 
     def get_elements(self):
-        return (self.__steg, self.__rgb, self.__enc)
+        return (self.__enc, self.__rgb, self.__steg)
 
     def __link_checkboxes(self):
         self.checkBox.stateChanged.connect(self.__stegano_changed)
