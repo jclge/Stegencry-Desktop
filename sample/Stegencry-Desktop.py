@@ -1,5 +1,5 @@
 from PyQt5 import QtWidgets, uic
-from PyQt5.QtWidgets import QApplication, QWidget, QLabel, QPushButton, QVBoxLayout, QWidget, QFileDialog, QGridLayout, QCheckBox, QDialog, QInputDialog, QMainWindow
+from PyQt5.QtWidgets import QApplication, QWidget, QLabel, QPushButton, QVBoxLayout, QWidget, QFileDialog, QGridLayout, QCheckBox, QDialog, QInputDialog, QMainWindow, QMessageBox
 from PyQt5.QtGui import QPixmap
 from PyQt5.QtCore import Qt, QFile, QIODevice, QTextStream, pyqtSignal
 from PyQt5.QtGui import QCursor
@@ -23,6 +23,7 @@ class DialogCustom(QDialog):
 
     def __link_checkboxes(self):
         self.checkBox.stateChanged.connect(self.__stegano_changed)
+        self.checkBox.setToolTip('Does not work with MacOS screenshots.')
         self.checkBox_2.stateChanged.connect(self.__rgb_changed)
         self.checkBox_3.stateChanged.connect(self.__enc_changed)
 
@@ -74,6 +75,7 @@ class StegencryDesktop(QMainWindow):
         self.__slave = None
         self.__key = None
         self.__enc = None
+        self.__warned = False
         self.__path = "image.png"
 
     def __link_buttons(self):
@@ -117,11 +119,16 @@ class StegencryDesktop(QMainWindow):
             self.__enc.steganography()
 
     def __encrypt(self):
+        elements = self.__dialog.get_elements()
+        if (elements[2] == True and self.__warned == False):
+            self.__warned = True
+            if (QMessageBox.information(None, "Information about Steganography", "Please note that Steganography has issues:\n  - Data loss is inherent to steganography.\n  - Steganography in Stegencry doesn't support any kind of MacOS screenshots.\n  - Transparent PNGs may be corrupted in some cases.\n\nTo change the encryption options,  please press Ctrl+P or Custom -> Custom Dialog.", QMessageBox.Ok, QMessageBox.Cancel) != True):
+                return
         self.__enc = encrypt()
         self.__enc.set_master(self.__path)
         if (self.__manage_missing_elements() == False):
             return
-        self.__process_encrypt(self.__dialog.get_elements())
+        self.__process_encrypt(elements)
         self.__enc.set_output("res.png")
         self.__enc.save_image()
         self.__path = ("res.png")

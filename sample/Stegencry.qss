@@ -17,6 +17,8 @@ QMainWindow
 QPushButton
 {
     border-radius: 15px;
+    font-size: 40px;
+    color: white;
     border: 1px solid rgba(255, 255, 255, .4);
 }
 
